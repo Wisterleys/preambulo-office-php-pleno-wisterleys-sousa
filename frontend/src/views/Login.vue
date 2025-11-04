@@ -1,43 +1,50 @@
 <template>
   <div class="login-container">
     <div class="login-box">
-      <div class="login-logo">
-        <span class="logo-icon">🎬</span>
-        <span>Preâmbulo <span class="logo-highlight">Movies</span></span>
+      <h1 class="logo">Préambulo Movies</h1>
+      <h2>Entrar</h2>
+      
+      <div v-if="error" class="alert alert-error">
+        {{ error }}
       </div>
-      
-      <div v-if="error" class="error">{{ error }}</div>
-      
+
       <form @submit.prevent="handleLogin">
         <div class="form-group">
-          <label>Tipo de Usuário</label>
-          <select v-model="userType" required>
-            <option value="user">Funcionário (Admin/Atendente)</option>
-            <option value="client">Cliente</option>
-          </select>
+          <label class="form-label" for="email">Email</label>
+          <input
+            id="email"
+            v-model="credentials.email"
+            type="email"
+            class="form-input"
+            placeholder="seu@email.com"
+            required
+          />
         </div>
 
         <div class="form-group">
-          <label>E-mail</label>
-          <input type="email" v-model="email" required />
+          <label class="form-label" for="password">Senha</label>
+          <input
+            id="password"
+            v-model="credentials.password"
+            type="password"
+            class="form-input"
+            placeholder="••••••••"
+            required
+          />
         </div>
 
-        <div class="form-group">
-          <label>Senha</label>
-          <input type="password" v-model="password" required />
-        </div>
-
-        <button type="submit" class="btn btn-primary" style="width: 100%">
-          Entrar
+        <button
+          type="submit"
+          class="btn btn-primary btn-block"
+          :disabled="loading"
+        >
+          {{ loading ? 'Entrando...' : 'Entrar' }}
         </button>
       </form>
 
-      <div style="margin-top: 20px; font-size: 12px; color: var(--text-secondary)">
-        <p><strong>Credenciais de teste:</strong></p>
-        <p>Admin: admin@preambulomovies.com / admin123</p>
-        <p>Atendente: atendente@preambulomovies.com / atendente123</p>
-        <p>Cliente: joao@example.com / cliente123</p>
-      </div>
+      <p class="login-footer">
+        Não tem uma conta? Entre em contato com o administrador.
+      </p>
     </div>
   </div>
 </template>
@@ -46,35 +53,75 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
-// import { getCsrfCookie } from '../services/api' // Removido
 
 const router = useRouter()
 const authStore = useAuthStore()
 
-const email = ref('')
-const password = ref('')
-const userType = ref('user')
-const error = ref('')
+const credentials = ref({
+  email: '',
+  password: ''
+})
+
+const loading = ref(false)
+const error = ref(null)
 
 const handleLogin = async () => {
-  try {
-    error.value = ''
-    
-    // 1. Obter o cookie CSRF (Removido, pois o login não precisa de CSRF)
-    // await getCsrfCookie()
+  loading.value = true
+  error.value = null
 
-    // 2. Tentar o login
-    await authStore.login(email.value, password.value, userType.value)
-    
-    if (authStore.isAdmin) {
-      router.push('/admin/dashboard')
-    } else if (authStore.isAttendant) {
-      router.push('/attendant/dashboard')
-    } else {
-      router.push('/client/dashboard')
-    }
-  } catch (err) {
-    error.value = err.response?.data?.message || 'Erro ao fazer login'
+  const success = await authStore.login(credentials.value)
+
+  if (success) {
+    router.push({ name: 'Dashboard' })
+  } else {
+    error.value = authStore.error
   }
+
+  loading.value = false
 }
 </script>
+
+<style scoped>
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+  padding: 20px;
+}
+
+.login-box {
+  background-color: var(--background-card);
+  padding: 40px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.logo {
+  color: var(--primary-color);
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 28px;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: var(--text-primary);
+}
+
+.btn-block {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.login-footer {
+  text-align: center;
+  margin-top: 20px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+</style>
