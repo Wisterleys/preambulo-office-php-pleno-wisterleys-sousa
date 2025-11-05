@@ -14,11 +14,12 @@ return new class extends Migration
         Schema::create('pessoas', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users');
             $table->string('nome_completo');
             $table->string('cpf', 14)->nullable()->unique();
-            $table->date('data_nascimento');
-            $table->text('endereco');
+            $table->date('data_nascimento')->nullable();
+            $table->string('telefone', 20)->nullable();
+            $table->text('endereco')->nullable();
             $table->string('foto_perfil')->nullable();
             $table->enum('role', ['admin', 'attendant', 'customer'])->default('customer');
             $table->timestamps();

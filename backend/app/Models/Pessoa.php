@@ -16,7 +16,6 @@ class Pessoa extends Model
     protected $table = 'pessoas';
 
     protected $fillable = [
-        'uuid',
         'user_id',
         'nome_completo',
         'cpf',

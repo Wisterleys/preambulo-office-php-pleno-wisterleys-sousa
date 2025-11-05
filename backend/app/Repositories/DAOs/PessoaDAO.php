@@ -8,9 +8,12 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class PessoaDAO implements PessoaRepositoryInterface
 {
-    public function __construct(
-        protected Pessoa $model
-    ) {}
+    protected $model;
+
+    public function __construct() 
+    {
+        $this->model = new Pessoa();
+    }
 
     public function all(): LengthAwarePaginator
     {
@@ -22,10 +25,14 @@ class PessoaDAO implements PessoaRepositoryInterface
 
     public function findByUuid(string $uuid): ?Pessoa
     {
-        return $this->model
-            ->with('user', 'locacoes')
-            ->where('uuid', $uuid)
-            ->first();
+        try {
+            return $this->model
+                ->with(['user', 'locacoes'])
+                ->where('uuid', $uuid)
+                ->first();
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     public function findByUserId(int $userId): ?Pessoa

@@ -9,15 +9,15 @@ use Illuminate\Support\Facades\Validator;
 class AuthController extends Controller
 {
     public function login(Request $request)
-    {\Log::info('Tentativa de login', ['email' => $request->input('email')]);
+    {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
-            'password' => 'required|string|min:6',
+            'password' => 'required|string|min:8',
         ], [
             'email.required' => 'O email é obrigatório',
             'email.email' => 'Email inválido',
             'password.required' => 'A senha é obrigatória',
-            'password.min' => 'A senha deve ter no mínimo 6 caracteres',
+            'password.min' => 'A senha deve ter no mínimo 8 caracteres',
         ]);
 
         if ($validator->fails()) {

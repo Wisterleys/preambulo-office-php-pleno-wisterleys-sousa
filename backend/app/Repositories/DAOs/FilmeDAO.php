@@ -10,9 +10,12 @@ use Illuminate\Support\Facades\Cache;
 
 class FilmeDAO implements FilmeRepositoryInterface
 {
-    public function __construct(
-        protected Filme $model
-    ) {}
+    protected $model;
+
+    public function __construct() 
+    {
+        $this->model = new Filme();
+    }
 
     public function all(): LengthAwarePaginator
     {
@@ -23,9 +26,13 @@ class FilmeDAO implements FilmeRepositoryInterface
 
     public function findByUuid(string $uuid): ?Filme
     {
-        return $this->model
-            ->where('uuid', $uuid)
-            ->first();
+        try {
+            return $this->model
+                ->where('uuid', $uuid)
+                ->first();
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     public function create(array $data): Filme

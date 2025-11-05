@@ -15,20 +15,12 @@ class PessoaObserver
      */
     public function creating(Pessoa $pessoa): void
     {
-        // Criar User automaticamente se não existir user_id
-        if (empty($pessoa->user_id)) {
-            $user = User::create([
-                'name' => $pessoa->nome_completo,
-                'email' => $this->gerarEmailTemporario($pessoa),
-                'password' => Hash::make(Str::random(16)),
-            ]);
-            $pessoa->user_id = $user->id;
-        }
+        //
     }
 
     public function created(Pessoa $pessoa): void
     {
-        Cache::tags(['pessoas'])->flush();
+        //
     }
 
     /**
@@ -36,12 +28,7 @@ class PessoaObserver
      */
     public function updated(Pessoa $pessoa): void
     {
-        Cache::tags(['pessoas'])->flush();
-        
-        // Atualizar nome do user se mudou
-        if ($pessoa->isDirty('nome_completo')) {
-            $pessoa->user->update(['name' => $pessoa->nome_completo]);
-        }
+        //
     }
 
     /**
@@ -49,7 +36,7 @@ class PessoaObserver
      */
     public function deleted(Pessoa $pessoa): void
     {
-        Cache::tags(['pessoas'])->flush();
+        //
     }
 
     /**
@@ -66,16 +53,5 @@ class PessoaObserver
     public function forceDeleted(Pessoa $pessoa): void
     {
         //
-    }
-
-    /**
-     * Gerar email temporário baseado no CPF ou nome
-     */
-    private function gerarEmailTemporario(Pessoa $pessoa): string
-    {
-        if ($pessoa->cpf) {
-            return 'user_' . preg_replace('/\D/', '', $pessoa->cpf) . '@preambulo.temp';
-        }
-        return 'user_' . Str::slug($pessoa->nome_completo) . '_' . time() . '@preambulo.temp';
     }
 }

@@ -13,8 +13,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            PessoaSeeder::class,
-            // Outros seeders aqui
+            UserSeeder::class,
         ]);
     }
 }

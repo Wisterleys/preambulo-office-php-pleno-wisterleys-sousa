@@ -10,9 +10,11 @@ use Illuminate\Support\Collection;
 
 class LocacaoDAO implements LocacaoRepositoryInterface
 {
-    public function __construct(
-        protected Locacao $model
-    ) {}
+    protected $model;
+
+    public function __construct() {
+        $this->model = new Locacao();
+    }
 
     public function all(): LengthAwarePaginator
     {
@@ -24,10 +26,14 @@ class LocacaoDAO implements LocacaoRepositoryInterface
 
     public function findByUuid(string $uuid): ?Locacao
     {
-        return $this->model
-            ->with('pessoa', 'filmes')
-            ->where('uuid', $uuid)
-            ->first();
+        try {
+            return $this->model
+                ->with(['pessoa', 'filmes'])
+                ->where('uuid', $uuid)
+                ->first();
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     public function create(array $data): Locacao

@@ -15,7 +15,6 @@ class Filme extends Model
     protected $table = 'filmes';
 
     protected $fillable = [
-        'uuid',
         'titulo',
         'sinopse',
         'ano',

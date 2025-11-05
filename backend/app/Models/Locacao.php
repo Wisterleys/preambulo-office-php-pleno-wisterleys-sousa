@@ -17,7 +17,6 @@ class Locacao extends Model
     protected $table = 'locacoes';
 
     protected $fillable = [
-        'uuid',
         'pessoa_id',
         'data_inicio',
         'data_prevista_devolucao',
