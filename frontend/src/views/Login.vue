@@ -1,127 +1,179 @@
 <template>
   <div class="login-container">
-    <div class="login-box">
-      <h1 class="logo">Préambulo Movies</h1>
-      <h2>Entrar</h2>
-      
-      <div v-if="error" class="alert alert-error">
-        {{ error }}
-      </div>
+    <div class="login-card">
+      <h1 class="login-title">Entrar</h1>
+      <p class="login-subtitle">Acesse sua conta Préâmbulo Movies</p>
 
-      <form @submit.prevent="handleLogin">
+      <form @submit.prevent="handleLogin" class="login-form">
         <div class="form-group">
-          <label class="form-label" for="email">Email</label>
+          <label for="email" class="form-label">Email</label>
           <input
             id="email"
-            v-model="credentials.email"
+            v-model="email"
             type="email"
-            class="form-input"
             placeholder="seu@email.com"
+            class="form-control"
             required
           />
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="password">Senha</label>
+          <label for="password" class="form-label">Senha</label>
           <input
             id="password"
-            v-model="credentials.password"
+            v-model="password"
             type="password"
-            class="form-input"
-            placeholder="••••••••"
+            placeholder="Sua senha"
+            class="form-control"
             required
           />
         </div>
 
-        <button
-          type="submit"
-          class="btn btn-primary btn-block"
-          :disabled="loading"
-        >
-          {{ loading ? 'Entrando...' : 'Entrar' }}
+        <div v-if="error" class="alert alert-danger">
+          {{ error }}
+        </div>
+
+        <button type="submit" class="btn btn-primary w-full" :disabled="isLoading">
+          {{ isLoading ? 'Entrando...' : 'Entrar' }}
         </button>
       </form>
 
       <p class="login-footer">
-        Não tem uma conta? Entre em contato com o administrador.
+        Não tem conta? <router-link to="/cadastro">Cadastre-se aqui</router-link>
       </p>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '../stores/auth'
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '../store/authStore';
 
-const router = useRouter()
-const authStore = useAuthStore()
+const router = useRouter();
+const authStore = useAuthStore();
 
-const credentials = ref({
-  email: '',
-  password: ''
-})
-
-const loading = ref(false)
-const error = ref(null)
+const email = ref('');
+const password = ref('');
+const isLoading = ref(false);
+const error = ref<string | null>(null);
 
 const handleLogin = async () => {
-  loading.value = true
-  error.value = null
+  isLoading.value = true;
+  error.value = null;
 
-  const success = await authStore.login(credentials.value)
-
-  if (success) {
-    router.push({ name: 'Dashboard' })
-  } else {
-    error.value = authStore.error
+  try {
+    await authStore.login({ email: email.value, password: password.value });
+    router.push('/dashboard');
+  } catch (err: any) {
+    error.value = err.response?.data?.mensagem || 'Erro ao fazer login';
+  } finally {
+    isLoading.value = false;
   }
-
-  loading.value = false
-}
+};
 </script>
 
 <style scoped>
 .login-container {
-  min-height: 100vh;
   display: flex;
-  justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
-  padding: 20px;
+  justify-content: center;
+  min-height: calc(100vh - 80px);
+  padding: var(--spacing-lg);
 }
 
-.login-box {
-  background-color: var(--background-card);
-  padding: 40px;
-  border-radius: 8px;
-  width: 100%;
+.login-card {
+  background-color: var(--color-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-2xl);
   max-width: 400px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-}
-
-.logo {
-  color: var(--primary-color);
-  text-align: center;
-  margin-bottom: 10px;
-  font-size: 28px;
-}
-
-h2 {
-  text-align: center;
-  margin-bottom: 30px;
-  color: var(--text-primary);
-}
-
-.btn-block {
   width: 100%;
-  margin-top: 10px;
+  box-shadow: var(--shadow-xl);
+}
+
+.login-title {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-sm);
+  text-align: center;
+}
+
+.login-subtitle {
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.form-label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.form-control {
+  padding: var(--spacing-md) var(--spacing-lg);
+  background-color: var(--color-dark);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  color: var(--color-text);
+  font-size: var(--font-size-base);
+  transition: all var(--transition-fast);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+}
+
+.form-control::placeholder {
+  color: var(--color-border);
+}
+
+.w-full {
+  width: 100%;
+}
+
+.alert {
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-sm);
+}
+
+.alert-danger {
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid var(--color-danger);
+  color: var(--color-danger);
 }
 
 .login-footer {
   text-align: center;
-  margin-top: 20px;
-  color: var(--text-secondary);
-  font-size: 14px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  margin-top: var(--spacing-lg);
+}
+
+.login-footer a {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.login-footer a:hover {
+  text-decoration: underline;
 }
 </style>

@@ -4,46 +4,44 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Repositories\Interfaces\LocacaoRepositoryInterface;
 
 class LocacaoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    protected $locacaoRepository;
+
+    public function __construct(LocacaoRepositoryInterface $locacaoRepository)
+    {
+        $this->locacaoRepository = $locacaoRepository;
+    }
+
     public function index()
     {
-        //
+        $locacoes = $this->locacaoRepository->all();
+        return response()->json(['sucesso' => true, 'dados' => $locacoes]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $locacao = $this->locacaoRepository->create($request->all());
+        return response()->json(['sucesso' => true, 'dados' => $locacao], 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        //
+        $locacao = $this->locacaoRepository->find($id);
+        return response()->json(['sucesso' => true, 'dados' => $locacao]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
-        //
+        $locacao = $this->locacaoRepository->update($id, $request->all());
+        return response()->json(['sucesso' => true, 'dados' => $locacao]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        //
+        $this->locacaoRepository->delete($id);
+        return response()->json(['sucesso' => true, 'mensagem' => 'Locação excluída com sucesso']);
     }
 }

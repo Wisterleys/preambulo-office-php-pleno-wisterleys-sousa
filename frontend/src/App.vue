@@ -1,35 +1,64 @@
 <template>
   <div id="app" class="app-container">
-    <router-view />
+    <nav class="navbar navbar-dark bg-dark sticky-top">
+      <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1">
+          <strong>Préâmbulo Movies</strong>
+        </span>
+        <div class="d-flex gap-2">
+          <router-link to="/" class="btn btn-sm btn-outline-light">Home</router-link>
+          <router-link v-if="!isAuthenticated" to="/login" class="btn btn-sm btn-primary">Login</router-link>
+          <router-link v-if="isAuthenticated" to="/dashboard" class="btn btn-sm btn-outline-light">Dashboard</router-link>
+          <button v-if="isAuthenticated" @click="logout" class="btn btn-sm btn-danger">Logout</button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="main-content">
+      <router-view />
+    </main>
   </div>
 </template>
 
-<script setup>
-import { onMounted } from 'vue'
-import { useAuthStore } from './stores/auth'
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from './store/authStore';
 
-const authStore = useAuthStore()
+const router = useRouter();
+const authStore = useAuthStore();
 
-onMounted(() => {
-  // Verificar se há token salvo
-  authStore.checkAuth()
-})
+const isAuthenticated = computed(() => authStore.isAuthenticated);
+
+const logout = async () => {
+  await authStore.logout();
+  router.push('/');
+};
 </script>
 
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #0f0f0f;
+<style scoped>
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #0a0e27;
   color: #ffffff;
 }
 
-.app-container {
-  min-height: 100vh;
+.main-content {
+  flex: 1;
+  padding: 2rem 0;
+}
+
+.navbar {
+  background-color: #1a1f3a !important;
+  border-bottom: 1px solid #2d3561;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  color: #00d4ff !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 </style>

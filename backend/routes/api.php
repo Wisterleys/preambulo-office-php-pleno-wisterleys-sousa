@@ -11,7 +11,7 @@ use App\Http\Controllers\Api\PerfilController;
 // Rotas públicas
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/filmes', [FilmeController::class, 'index']);
-Route::get('/filmes/{uuid}', [FilmeController::class, 'show']);
+Route::get('/filmes/{id}', [FilmeController::class, 'show']);
 
 // Rotas protegidas por JWT
 Route::middleware('auth:api')->group(function () {
@@ -29,15 +29,15 @@ Route::middleware('auth:api')->group(function () {
 
     // Admin
     Route::middleware('role:admin')->group(function () {
-        Route::apiResource('pessoas', PessoaController::class);
+        Route::apiResource('pessoas', PessoaController::class)->except(['store']);
         Route::apiResource('filmes', FilmeController::class)->except(['index', 'show']);
     });
 
     // Admin e Atendente
     Route::middleware('role:admin,attendant')->group(function () {
         Route::post('/pessoas/cliente', [PessoaController::class, 'storeCliente']);
-        Route::apiResource('locacoes', LocacaoController::class);
-        Route::put('/locacoes/{uuid}/devolver', [LocacaoController::class, 'devolver']);
+        Route::apiResource('locacoes', LocacaoController::class)->except(['update', 'destroy']);
+        Route::put('/locacoes/{id}/devolver', [LocacaoController::class, 'devolver']);
     });
 
     // Cliente

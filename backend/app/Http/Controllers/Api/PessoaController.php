@@ -4,46 +4,44 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Repositories\Interfaces\PessoaRepositoryInterface;
 
 class PessoaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    protected $pessoaRepository;
+
+    public function __construct(PessoaRepositoryInterface $pessoaRepository)
+    {
+        $this->pessoaRepository = $pessoaRepository;
+    }
+
     public function index()
     {
-        //
+        $pessoas = $this->pessoaRepository->all();
+        return response()->json(['sucesso' => true, 'dados' => $pessoas]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $pessoa = $this->pessoaRepository->create($request->all());
+        return response()->json(['sucesso' => true, 'dados' => $pessoa], 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        //
+        $pessoa = $this->pessoaRepository->find($id);
+        return response()->json(['sucesso' => true, 'dados' => $pessoa]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
-        //
+        $pessoa = $this->pessoaRepository->update($id, $request->all());
+        return response()->json(['sucesso' => true, 'dados' => $pessoa]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        //
+        $this->pessoaRepository->delete($id);
+        return response()->json(['sucesso' => true, 'mensagem' => 'Pessoa excluída com sucesso']);
     }
 }
