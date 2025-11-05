@@ -1,4 +1,4 @@
-# Préambulo Movies
+# Preâmbulo Movies
 
 Sistema completo de locação de filmes com backend Laravel 12 (API RESTful) e frontend Vue 3, inspirado no design do Prime Video.
 
